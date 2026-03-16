@@ -2,7 +2,7 @@
 
 > **6+ microservices · Kafka · Saga Pattern · Kubernetes · 10K req/sec-ready architecture**
 
-A production-style backend blueprint for a modern e-commerce system built with **Spring Boot 3** and **Spring Cloud**.
+A production-style backend blueprint for a modern e-commerce system built with **Spring Boot 3**, **Spring Cloud**, and now fully wired **Service Discovery with Eureka**.
 
 ![Stack](https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?logo=springboot)
 ![Kafka](https://img.shields.io/badge/Kafka-Event%20Driven-231F20?logo=apachekafka)
@@ -18,6 +18,7 @@ A production-style backend blueprint for a modern e-commerce system built with *
 This project demonstrates practical understanding of:
 - **Distributed transactions** with the **Saga pattern**
 - **Event-driven architecture** using **Kafka**
+- **Service discovery & dynamic routing** with **Eureka + Spring Cloud Gateway**
 - **Circuit breakers and resilience** for service-to-service calls
 - **Production observability** with logs, traces, and metrics
 
@@ -38,6 +39,22 @@ ecommerce-platform/
 ├── inventory-service/         # Stock :8085
 └── notification-service/      # Email/SMS :8086
 ```
+
+## Eureka service discovery setup
+
+- `eureka-server` runs on **:8761** and hosts the registry dashboard.
+- All services register themselves with:
+  - `eureka.client.service-url.defaultZone=http://localhost:8761/eureka`
+  - instance id format `${spring.application.name}:${server.port}`
+- `api-gateway` uses `lb://` URIs and discovery locator for dynamic route resolution.
+
+### Discovery verification endpoints
+
+Every service exposes internal discovery debug endpoints:
+- `GET /internal/discovery/services`
+- `GET /internal/discovery/instances`
+
+These endpoints use Spring `DiscoveryClient` so you can verify registration and instance visibility from any service.
 
 ## Services you'll build
 
@@ -81,6 +98,25 @@ ecommerce-platform/
 
 ```bash
 mvn -q clean compile
+```
+
+### Recommended startup order
+
+```bash
+# 1) Registry
+mvn -pl eureka-server spring-boot:run
+
+# 2) Infrastructure
+mvn -pl config-server spring-boot:run
+mvn -pl api-gateway spring-boot:run
+
+# 3) Business services
+mvn -pl user-service spring-boot:run
+mvn -pl product-service spring-boot:run
+mvn -pl order-service spring-boot:run
+mvn -pl payment-service spring-boot:run
+mvn -pl inventory-service spring-boot:run
+mvn -pl notification-service spring-boot:run
 ```
 
 ### Next steps
