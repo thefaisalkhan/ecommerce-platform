@@ -47,6 +47,8 @@ ecommerce-platform/
   - `eureka.client.service-url.defaultZone=http://localhost:8761/eureka`
   - instance id format `${spring.application.name}:${server.port}`
 - `api-gateway` uses `lb://` URIs and discovery locator for dynamic route resolution.
+- `config-server` now serves gateway routing/CORS defaults from local native config (`classpath:/config`) so the gateway can externalize route definitions.
+- `api-gateway` reads central config via `spring.config.import=optional:configserver:http://localhost:8888` with a `local` profile fallback.
 
 ### Discovery verification endpoints
 
