@@ -4,12 +4,13 @@ server:
 spring:
   application:
     name: config-server
+  profiles:
+    active: native
   cloud:
     config:
       server:
-        git:
-          uri: https://github.com/example/config-repo
-          default-label: main
+        native:
+          search-locations: classpath:/config,file:./config-repo
 
 eureka:
   client:
@@ -24,4 +25,4 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,env,configprops
